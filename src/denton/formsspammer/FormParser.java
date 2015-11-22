@@ -29,7 +29,7 @@ public class FormParser {
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(
 				url.openStream()));) {
-			while ((c = br.read()) != 0) {
+			while ((c = br.read()) != -1) {
 				sb.append((char) c);
 			}
 		} catch (IOException e) {
@@ -41,13 +41,13 @@ public class FormParser {
 	}
 
 	private void parsePostURL(String content) {
-		Matcher matcher = Pattern
+		Matcher urlMatcher = Pattern
 				.compile(
 						"<form action=\"(https://docs\\.google\\.com/forms/d/[a-zA-Z0-9]+/formResponse)\" method=\"POST\" id=\"ss-form\" target=\"_self\" onsubmit=\"\">")
 				.matcher(content);
-		matcher.find();
+		urlMatcher.find();
 		try {
-			postURL = new URL(matcher.group(1));
+			postURL = new URL(urlMatcher.group(1));
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			postURL = null;
@@ -56,29 +56,29 @@ public class FormParser {
 
 	private void parseElements(String content) {
 		final Map<String, ElementType> elementMap = new HashMap<>();
-		Matcher matcher = Pattern.compile(
-				"<input type=\"([a-z]+)\" name=\"(entry\\.[0-9]+)").matcher(
-				content);
-
+		Matcher normalMatcher = Pattern
+				.compile(
+						"<input type=\"([a-z]+)\" name=\"(entry\\..+?)\" value=\"(.*?)\"")
+				.matcher(
+						content);
+		Matcher textAreaMatcher = Pattern.compile(
+				"<textarea name=\"(entry.[0-9]+)\" ")
+				.matcher(content);
+		
 		// this sets up the Map
 		for (ElementType type : ElementType.values()) {
 			elementMap.put(type.toString().toLowerCase(), type);
 		}
 
-		while (matcher.find()) {
-			formElements.add(new FormElement(elementMap.get(matcher.group(1)), matcher.group(2)));
+		while (normalMatcher.find()) {
+			formElements.add(new FormElement(elementMap.get(normalMatcher
+					.group(1)), normalMatcher.group(2), normalMatcher.group(3)));
 		}
 
-		parseTextAreas(content);
-	}
-
-	private void parseTextAreas(String content) {
-		Matcher matcher = Pattern.compile("<textarea name=\"(entry.[0-9]+)\"")
-				.matcher(content);
-		while (matcher.find()) {
-			formElements.add(new FormElement(ElementType.TEXTAREA, matcher.group(1)));
+		while (textAreaMatcher.find()) {
+			formElements.add(new FormElement(ElementType.TEXTAREA,
+					textAreaMatcher.group(1), ""));
 		}
-
 	}
 
 	public URL getPostURL() {
@@ -88,4 +88,5 @@ public class FormParser {
 	public Set<FormElement> getFormElementSet() {
 		return this.formElements;
 	}
+
 }
