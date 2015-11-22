@@ -15,22 +15,22 @@ import java.util.regex.Pattern;
 public class FormParser {
 
 	private URL postURL;
-	private Set<FormElement> elements;
+	private Set<FormElement> formElements;
 
 	public FormParser(URL url) {
-		elements = new HashSet<>();
+		formElements = new HashSet<>();
 		String content = getContent(url);
 		parsePostURL(content);
 		parseElements(content);
 	}
 
 	private String getContent(URL url) {
-		String s;
+		int c;
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(
 				url.openStream()));) {
-			while ((s = br.readLine()) != null) {
-				sb.append(s);
+			while ((c = br.read()) != 0) {
+				sb.append((char) c);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -55,18 +55,18 @@ public class FormParser {
 	}
 
 	private void parseElements(String content) {
-		final Map<String, SubmissionElement> elementMap = new HashMap<>();
+		final Map<String, ElementType> elementMap = new HashMap<>();
 		Matcher matcher = Pattern.compile(
 				"<input type=\"([a-z]+)\" name=\"(entry\\.[0-9]+)").matcher(
 				content);
 
 		// this sets up the Map
-		for (SubmissionElement element : SubmissionElement.values()) {
-			elementMap.put(element.toString().toLowerCase(), element);
+		for (ElementType type : ElementType.values()) {
+			elementMap.put(type.toString().toLowerCase(), type);
 		}
 
 		while (matcher.find()) {
-			elements.add(new FormElement(elementMap.get(matcher.group(1)), matcher.group(2)));
+			formElements.add(new FormElement(elementMap.get(matcher.group(1)), matcher.group(2)));
 		}
 
 		parseTextAreas(content);
@@ -76,7 +76,7 @@ public class FormParser {
 		Matcher matcher = Pattern.compile("<textarea name=\"(entry.[0-9]+)\"")
 				.matcher(content);
 		while (matcher.find()) {
-			elements.add(new FormElement(SubmissionElement.TEXTAREA, matcher.group(1)));
+			formElements.add(new FormElement(ElementType.TEXTAREA, matcher.group(1)));
 		}
 
 	}
@@ -85,4 +85,7 @@ public class FormParser {
 		return this.postURL;
 	}
 
+	public Set<FormElement> getFormElementSet() {
+		return this.formElements;
+	}
 }

@@ -1,15 +1,11 @@
 package denton.formsspammer;
 
 public class FormElement {
-	public final SubmissionElement submissionElement;
+	public final ElementType type;
 	public final String name;
 	
-	public FormElement(SubmissionElement submissionElement, String name) {
-		this.submissionElement = submissionElement;
+	public FormElement(ElementType type, String name) {
+		this.type = type;
 		this.name = name;
-	}
-	
-	public String toString() {
-		return submissionElement.toString() +", " +name;
 	}
 }

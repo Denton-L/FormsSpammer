@@ -1,4 +1,5 @@
 package denton.formsspammer;
+
 public class NameValuePair {
 	public final String name;
 	public final Object value;
