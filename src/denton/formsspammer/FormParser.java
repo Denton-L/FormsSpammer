@@ -5,13 +5,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FormParser {
 
-	private String content;
+	private URL postURL;
 
 	public FormParser(URL url) {
-		this.content = getContent(url);
+		String content = getContent(url);
+		parsePostURL(content);
 	}
 
 	private String getContent(URL url) {
@@ -23,10 +26,29 @@ public class FormParser {
 				sb.append(s);
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
 			return null;
 		}
-		
+
 		return sb.toString();
+	}
+
+	private void parsePostURL(String content) {
+		Matcher matcher = Pattern
+				.compile(
+						"<form action=\"(.*)\" method=\"POST\" id=\"ss-form\" target=\"_self\" onsubmit=\"\">")
+				.matcher(content);
+		matcher.find();
+		try {
+			postURL = new URL(matcher.group(1));
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			postURL = null;
+		}
+	}
+
+	public URL getPostURL() {
+		return this.postURL;
 	}
 
 }
