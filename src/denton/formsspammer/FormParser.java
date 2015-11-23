@@ -74,10 +74,9 @@ public class FormParser {
 			formElements.add(new FormElement(elementMap.get(normalMatcher
 					.group(1)), normalMatcher.group(2), normalMatcher.group(3)));
 		}
-
+		
 		while (textAreaMatcher.find()) {
-			formElements.add(new FormElement(ElementType.TEXTAREA,
-					textAreaMatcher.group(1), ""));
+			formElements.add(new FormElement(ElementType.TEXT, textAreaMatcher.group(1), ""));
 		}
 	}
 
