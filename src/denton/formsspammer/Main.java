@@ -5,7 +5,7 @@ import java.net.URL;
 
 public class Main implements Runnable {
 	
-	public static final int THREADS = 10;
+	public static final int THREADS = 1;
 	
 	private HTMLPoster htmlPoster;
 	private ElementProcessor elementProcessor;
@@ -20,9 +20,9 @@ public class Main implements Runnable {
 	}
 	
 	public void run() {
-//		while (true) {
+		while (true) {
 			sendOnce();
-//		}
+		}
 	}
 	
 	public static void formSpam(String target) throws MalformedURLException {
@@ -38,14 +38,16 @@ public class Main implements Runnable {
 		
 		new Main(htmlPoster, elementProcessor).sendOnce();
 		
-//		for (int i = 0; i < THREADS; i++) {
-//			new Thread(new Main(htmlPoster, elementProcessor)).start();
-//		}
+		for (int i = 0; i < THREADS; i++) {
+			new Thread(new Main(htmlPoster, elementProcessor)).start();
+		}
 	}
 	
 	public static void main(String[] args) {
 		try {
-			formSpam("https://docs.google.com/forms/d/1xBZRcUQc9VSy6MlFScrkkY1P6nC6Psp3mASeCRjcAWw/viewform");
+			for (String arg : args) {
+				formSpam(arg);
+			}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
