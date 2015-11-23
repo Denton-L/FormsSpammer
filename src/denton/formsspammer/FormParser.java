@@ -43,7 +43,7 @@ public class FormParser {
 	private void parsePostURL(String content) {
 		Matcher urlMatcher = Pattern
 				.compile(
-						"<form action=\"(https://docs\\.google\\.com/forms/d/[a-zA-Z0-9_]+/formResponse)\" method=\"POST\" id=\"ss-form\" target=\"_self\" onsubmit=\"\">")
+						"<form action=\"(https://docs\\.google\\.com/forms/d/.+?/formResponse)\" method=\"POST\" id=\"ss-form\" target=\"_self\" onsubmit=\"\">")
 				.matcher(content);
 		urlMatcher.find();
 		try {
