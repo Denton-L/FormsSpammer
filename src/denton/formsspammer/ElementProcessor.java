@@ -68,7 +68,7 @@ public class ElementProcessor {
 		for (String text : texts) {
 			StringBuilder randomString = new StringBuilder();
 			while (random.nextGaussian() < TEXT_CHANCE) {
-				randomString.append((char) ' ' + random.nextInt(95));
+				randomString.append((char) (' ' + random.nextInt(95)));
 			}
 			params.add(new NameValuePair(text, randomString));
 		}
