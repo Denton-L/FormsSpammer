@@ -1,35 +1,41 @@
 package denton.formsspammer;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
 public class ElementProcessor {
-	
+
+	public static final double TEXT_CHANCE = 0.5;
+	public static final double CHECKBOX_CHANCE = 0.5;
+	public static final double TIME_CHANCE = 0.5;
+
 	private static class CheckboxElement {
 		public final String name;
 		public final String value;
-		
+
 		public CheckboxElement(String name, String value) {
 			this.name = name;
 			this.value = value;
 		}
 	}
-	
-	
+
 	private Set<String> texts = new HashSet<>();
-	private Map<String, Set<String>> radios = new HashMap<>();
+	private Map<String, List<String>> radios = new HashMap<>();
 	private Set<CheckboxElement> checkboxes = new HashSet<>();
 	private Set<String> dates = new HashSet<>();
 	private Set<String> times = new HashSet<>();
 	private Random random = new Random();
-	
+
 	public ElementProcessor(Set<FormElement> formElements) {
 		for (FormElement formElement : formElements) {
 			switch (formElement.type) {
-			//TEXT, TEXTAREA, RADIO, CHECKBOX, DATE, TIME;
 			case TEXT:
 				texts.add(formElement.name);
 				break;
@@ -37,13 +43,14 @@ public class ElementProcessor {
 				if (radios.containsKey(formElement.name)) {
 					radios.get(formElement.name).add(formElement.value);
 				} else {
-					Set<String> newSet = new HashSet<>();
+					List<String> newSet = new ArrayList<>();
 					newSet.add(formElement.value);
 					radios.put(formElement.name, newSet);
 				}
 				break;
 			case CHECKBOX:
-				checkboxes.add(new CheckboxElement(formElement.name, formElement.value));
+				checkboxes.add(new CheckboxElement(formElement.name,
+						formElement.value));
 				break;
 			case DATE:
 				dates.add(formElement.name);
@@ -54,14 +61,53 @@ public class ElementProcessor {
 			}
 		}
 	}
-	
+
 	public Set<NameValuePair> getParams() {
 		Set<NameValuePair> params = new HashSet<>();
+
 		for (String text : texts) {
 			StringBuilder randomString = new StringBuilder();
-			int c;
-			while (c = random.nextInt(bound))
+			while (random.nextGaussian() < TEXT_CHANCE) {
+				randomString.append((char) ' ' + random.nextInt(95));
+			}
+			params.add(new NameValuePair(text, randomString));
 		}
-		return null;
+
+		for (Map.Entry<String, List<String>> radio : radios.entrySet()) {
+			List<String> options = radio.getValue();
+			params.add(new NameValuePair(radio.getKey(), options.get(random
+					.nextInt(options.size()))));
+		}
+
+		for (CheckboxElement checkbox : checkboxes) {
+			if (random.nextGaussian() < CHECKBOX_CHANCE) {
+				params.add(new NameValuePair(checkbox.name, checkbox.value));
+			}
+		}
+
+		for (String date : dates) {
+			SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+			params.add(new NameValuePair(date, dateFormatter.format(new Date(
+					random.nextLong()))));
+		}
+
+		for (String time : times) {
+			SimpleDateFormat timeFormatter;
+			String timeFormat = "HH:mm";
+
+			if (random.nextGaussian() < TIME_CHANCE) {
+				timeFormat += ":ss";
+				if (random.nextGaussian() < TIME_CHANCE) {
+					timeFormat += ".SSS";
+				}
+			}
+
+			timeFormatter = new SimpleDateFormat(timeFormat);
+			params.add(new NameValuePair(time, timeFormatter.format(new Date(
+					random.nextLong()))));
+
+		}
+
+		return params;
 	}
 }
