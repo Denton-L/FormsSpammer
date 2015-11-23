@@ -57,6 +57,11 @@ public class ElementProcessor {
 	
 	public Set<NameValuePair> getParams() {
 		Set<NameValuePair> params = new HashSet<>();
+		for (String text : texts) {
+			StringBuilder randomString = new StringBuilder();
+			int c;
+			while (c = random.nextInt(bound))
+		}
 		return null;
 	}
 }
