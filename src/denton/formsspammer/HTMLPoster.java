@@ -48,14 +48,15 @@ public class HTMLPoster {
 					String.valueOf(postBytes.length));
 			connection.setDoOutput(true);
 			connection.getOutputStream().write(postBytes);
-			
+
 			connection.getInputStream().close();
-			
-//			Reader r = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//			int c;
-//			while ((c = r.read()) != -1) {
-//				System.err.print((char) c);
-//			}
+
+			// Reader r = new BufferedReader(new
+			// InputStreamReader(connection.getInputStream()));
+			// int c;
+			// while ((c = r.read()) != -1) {
+			// System.err.print((char) c);
+			// }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
