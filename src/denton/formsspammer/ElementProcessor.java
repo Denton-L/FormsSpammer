@@ -31,6 +31,7 @@ public class ElementProcessor {
 	private Set<CheckboxElement> checkboxes = new HashSet<>();
 	private Set<String> dates = new HashSet<>();
 	private Set<String> times = new HashSet<>();
+	private Map<String, List<String>> selects = new HashMap<>();
 	private Random random = new Random();
 
 	public ElementProcessor(Set<FormElement> formElements) {
@@ -58,6 +59,14 @@ public class ElementProcessor {
 			case TIME:
 				times.add(formElement.name);
 				break;
+			case SELECT:
+				if (selects.containsKey(formElement.name)) {
+					selects.get(formElement.name).add(formElement.value);
+				} else {
+					List<String> newSet = new ArrayList<>();
+					newSet.add(formElement.value);
+					selects.put(formElement.name, newSet);
+				}
 			}
 		}
 	}
@@ -106,6 +115,12 @@ public class ElementProcessor {
 			params.add(new NameValuePair(time, timeFormatter.format(new Date(
 					random.nextLong()))));
 
+		}
+		
+		for (Map.Entry<String, List<String>> select : selects.entrySet()) {
+			List<String> options = select.getValue();
+			params.add(new NameValuePair(select.getKey(), options.get(random
+					.nextInt(options.size()))));
 		}
 
 		return params;

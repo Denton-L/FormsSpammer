@@ -64,6 +64,11 @@ public class FormParser {
 		Matcher textAreaMatcher = Pattern.compile(
 				"<textarea name=\"(entry.[0-9]+)\" ")
 				.matcher(content);
+		Matcher selectMatcher = Pattern.compile(
+					"<select name=\"(entry.[0-9]+)\".+?>(?:<option value=\"(.*?)\">.*?<\\/option>\\s?)*<\\/select>")
+				.matcher(
+					content);
+		Pattern selectPattern = Pattern.compile("<option value=\"(.*?)\">\\1<\\/option>\\s?");
 		
 		// this sets up the Map
 		for (ElementType type : ElementType.values()) {
@@ -77,6 +82,14 @@ public class FormParser {
 		
 		while (textAreaMatcher.find()) {
 			formElements.add(new FormElement(ElementType.TEXT, textAreaMatcher.group(1), ""));
+		}
+		
+		while (selectMatcher.find()) {
+			Matcher selectGroupMatcher = selectPattern.matcher(selectMatcher.group());
+			selectGroupMatcher.find();
+			while (selectGroupMatcher.find()) {
+				formElements.add(new FormElement(ElementType.SELECT, selectMatcher.group(1), selectGroupMatcher.group(1)));
+			}
 		}
 	}
 
