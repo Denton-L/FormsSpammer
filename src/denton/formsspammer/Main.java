@@ -36,9 +36,7 @@ public class Main implements Runnable {
 		htmlPoster = new HTMLPoster(formParser.getPostURL());
 		elementProcessor = new ElementProcessor(formParser.getFormElementSet());
 		
-		new Main(htmlPoster, elementProcessor).sendOnce();
-		
-		for (int i = 1; i < THREADS; i++) {
+		for (int i = 0; i < THREADS; i++) {
 			new Thread(new Main(htmlPoster, elementProcessor)).start();
 		}
 	}
